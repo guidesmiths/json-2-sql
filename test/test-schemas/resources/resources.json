@@ -1,0 +1,30 @@
+{
+  "type": "create",
+  "schema": "resources",
+  "table": "resources",
+  "columns": [
+    {"name": "id", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "authorId", "type": "BIGINT", "encode": "LZO"},
+    {"name": "title", "type": "VARCHAR", "length": 1000, "encode": "LZO"},
+    {"name": "description", "type": "VARCHAR", "length": 65535, "encode": "LZO"},
+    {"name": "url", "type": "VARCHAR", "length": 300, "encode": "LZO"},
+    {"name": "private", "type": "BOOLEAN"},
+    {"name": "allowComments", "type": "BOOLEAN"},
+    {"name": "featured", "type": "BOOLEAN"},
+    {"name": "createdDate", "type": "TIMESTAMPTZ", "encode": "LZO"},
+    {"name": "modifiedDate", "type": "TIMESTAMPTZ", "encode": "LZO"},
+    {"name": "firstPublishedDate", "type": "TIMESTAMPTZ", "encode": "LZO"},
+    {"name": "recommendedDate", "type": "TIMESTAMPTZ", "encode": "LZO"},
+    {"name": "deleted", "type": "BOOLEAN"},
+    {"name": "draft", "type": "BOOLEAN"},
+    {"name": "createdtime", "type": "TIMESTAMPTZ", "default": "(CURRENT_TIMESTAMP AT TIME ZONE 'utc')", "encode": "LZO"},    {"name": "licence", "type": "VARCHAR", "length": 30, "encode": "LZO"},
+    {"name": "priceband", "type": "INT", "encode": "LZO"},
+    {"name": "country", "type": "CHAR", "length": 2, "encode": "LZO"},
+    {"name": "smlResourceId", "type": "INT", "encode": "LZO"},
+    {"name": "bundle", "type": "BOOLEAN", "default": "FALSE"},
+    {"name": "price", "type": "INT", "encode": "LZO"}
+  ],
+  "primaryKey": "id",
+  "distStyle": "ALL",
+  "sortKey": "id"
+}

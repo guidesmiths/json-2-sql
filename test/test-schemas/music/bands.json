@@ -1,0 +1,16 @@
+{
+  "schema": "music",
+  "table": "bands",
+  "description": "This is table of bands who make albums",
+  "columns": [
+    {"name": "id", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "name", "type": "VARCHAR", "length": 256, "encode": "ZSTD"},
+    {"name": "genre", "type": "VARCHAR", "length": 32, "encode": "BYTEDICT"}
+  ],
+  "primaryKey": "id",
+  "indexes": [
+    ["genre"]
+  ],
+  "distStyle": "ALL",
+  "sortKey": ["id"]
+}

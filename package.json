@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha ./test",
-    "prepush": "npm run test"
+    "prepush": "npm run test",
+    "start": "node ."
   },
   "repository": {
     "type": "git",
@@ -29,5 +30,13 @@
   "bugs": {
     "url": "https://github.com/guidesmiths/json2sql/issues"
   },
-  "homepage": "https://github.com/guidesmiths/json2sql#readme"
+  "homepage": "https://github.com/guidesmiths/json2sql#readme",
+  "dependencies": {
+    "install": "^0.10.1",
+    "json-sql": "^0.3.10",
+    "npm": "^4.6.1",
+    "pg-format": "^1.0.4",
+    "ramda": "^0.23.0",
+    "require-all": "^2.2.0"
+  }
 }

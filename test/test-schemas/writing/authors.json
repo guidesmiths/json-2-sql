@@ -1,0 +1,17 @@
+{
+  "schema": "writing",
+  "table": "authors",
+  "description": "This is table of people who write books",
+  "columns": [
+    {"name": "id", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "firstName", "type": "VARCHAR", "length": 32, "encode": "ZSTD"},
+    {"name": "lastName", "type": "VARCHAR", "length": 32, "encode": "ZSTD"},
+    {"name": "birthYear", "type": "INT", "encode": "LZO"}
+  ],
+  "primaryKey": "id",
+  "indexes": [
+    ["lastName"]
+  ],
+  "distStyle": "ALL",
+  "sortKey": ["id"]
+}

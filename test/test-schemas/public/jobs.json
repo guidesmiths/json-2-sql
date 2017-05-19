@@ -1,0 +1,20 @@
+{
+  "schema": "public",
+  "table": "meta",
+  "description": "This is table of misc cron-like jobs",
+  "columns": [
+    {"name": "id", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "type", "type": "VARCHAR", "length": 32, "encode": "BYTEDICT"},
+    {"name": "name", "type": "VARCHAR", "length": 64, "encode": "LZO"},
+    {"name": "startTime", "type": "TIMESTAMPTZ", "encode": "LZO"},
+    {"name": "endTime", "type": "TIMESTAMPTZ", "encode": "LZO"}
+  ],
+  "primaryKey": "id",
+  "indexes": [
+    ["type"],
+    ["name"],
+    ["startTime", "endTime"]
+  ],
+  "distStyle": "ALL",
+  "sortKey": ["id", "type"]
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "writing",
+  "table": "books",
+  "description": "This is table of books",
+  "columns": [
+    {"name": "id", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "authorId", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "title", "type": "VARCHAR", "length": 256, "encode": "ZSTD"},
+    {"name": "publishedYear", "type": "SMALLINT", "encode": "LZO"}
+  ],
+  "primaryKey": "id",
+  "indexes": [
+    ["authorId"]
+  ],
+  "distStyle": "ALL",
+  "sortKey": ["id"]
+}

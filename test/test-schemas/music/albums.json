@@ -1,0 +1,17 @@
+{
+  "schema": "music",
+  "table": "albums",
+  "description": "This is table of musical albums",
+  "columns": [
+    {"name": "id", "type": "INT", "nullable": false, "encode": "DELTA32K"},
+    {"name": "title", "type": "VARCHAR", "length": 256, "encode": "ZSTD"},
+    {"name": "dateReleased", "type": "DATE", "encode": "LZO"}
+  ],
+  "primaryKey": "id",
+  "indexes": [
+    ["dateReleased"]
+  ],
+  "distStyle": "KEY",
+  "distKey": "title",
+  "sortKey": "id"
+}
