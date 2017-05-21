@@ -1,4 +1,7 @@
-const operations = require('require-all')(__dirname);
+const operations = require('require-all')({
+  dirname: __dirname,
+  filter: (fileName) => fileName !== 'index.js' ? fileName.replace('.js', '') : '',
+});
 
 const translate = (json) => {
   const { type } = json;

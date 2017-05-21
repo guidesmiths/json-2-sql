@@ -65,7 +65,12 @@ const translate = (table) => {
 
   const normalisedTable = normalised(table);
 
-  const [ createStatement, columnsStatement, pKeyStatement, indexesStatement ] = R.map((fn) => fn(normalisedTable), [
+  const [
+    createStatement,
+    columnsStatement,
+    pKeyStatement,
+    indexesStatement
+  ] = R.map((fn) => fn(normalisedTable), [
     generateCreate,
     generateColumns,
     generatePrimaryKey,
