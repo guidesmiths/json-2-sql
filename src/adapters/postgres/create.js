@@ -50,22 +50,40 @@ const generateIndex = R.curry((schema, table, columns) => {
 
 const generateIndexes = ({ schema, table, indexes }) => R.map(generateIndex(schema, table), indexes);
 
-const normaliseTable = R.merge(DEFAULT_TABLE);
-const normaliseColumns = R.map(R.merge(DEFAULT_COLUMN));
-
 const translate = (table) => {
 
-  const normalised = R.merge(DEFAULT_TABLE, table);
-  const normalisedColumns = R.merge(normalised, { columns: R.map(R.merge(DEFAULT_COLUMN), normalised.columns) });
+  const normaliseTuple = ([ field, value ]) => {
+    const fnByField = {
+      columns: R.map(R.merge(DEFAULT_COLUMN)),
+      default: R.identity
+    };
+    const transformation = fnByField[field] || fnByField['default'];
+    return R.set(R.lensProp(field), transformation(value), {});
+  };
 
-  const createStatement = generateCreate(normalisedColumns);
-  const columnsStatement = generateColumns(normalisedColumns);
-  const pKeyStatement = generatePrimaryKey(normalisedColumns);
-  const indexesStatement = generateIndexes(normalisedColumns);
+  const normalised = R.pipe(
+    R.merge(DEFAULT_TABLE),
+    R.toPairs,
+    R.map(normaliseTuple),
+    R.mergeAll
+  );
+
+  const normalisedTable = normalised(table);
+
+  const [ createStatement, columnsStatement, pKeyStatement, indexesStatement ] = R.map((fn) => fn(normalisedTable), [
+    generateCreate,
+    generateColumns,
+    generatePrimaryKey,
+    generateIndexes
+  ]);
 
   const hasContent = R.complement(R.isEmpty);
+  const polish = R.pipe(
+    R.filter(R.identity),
+    R.join('\n')
+  );
 
-  const bits = [
+  return polish([
     ...createStatement,
     hasContent(columnsStatement) ? '(' : '',
     columnsStatement.join(',\n'),
@@ -73,9 +91,7 @@ const translate = (table) => {
     hasContent(columnsStatement) ? ')' : '',
     hasContent(columnsStatement) ? ';' : '',
     ...indexesStatement,
-  ];
-
-  return bits.filter(Boolean).join('\n');
+  ]);
 };
 
 module.exports = translate;
