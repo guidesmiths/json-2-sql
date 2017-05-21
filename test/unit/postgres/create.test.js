@@ -4,6 +4,11 @@ const resourcesJson = require('../../test-schemas/resources/resources.json');
 
 const { translate } = require('../../..')('postgres').index; // TODO filter out
 
+const translateCreation = R.pipe(
+  R.merge({ type: 'create' }),
+  translate
+);
+
 describe('Postgres create adapter', () => {
 
   it('should throw an error if no type is specified', (done) => {
@@ -24,14 +29,38 @@ describe('Postgres create adapter', () => {
     }
   });
 
-  it('creates table', () => {
-    const translation = translate({ type: "create", schema: 'foo', table: 'bar' });
+  it('should escape camelcase schema and table', () => {
+    const translation = translateCreation({ schema: 'fOO', table: 'bAR' });
+    expect(translation).to.equal('CREATE TABLE IF NOT EXISTS "fOO"."bAR"');
+  });
+
+  it('should handle simplest column', () => {
+    const translation = translateCreation({ columns: [ { name: 'id', type: 'INT' } ] });
+    expect(translation).to.match(/id INT/);
+  });
+
+  it('should join columns', () => {
+    const translation = translateCreation({
+      columns: [
+        { name: 'id', type: 'INT' },
+        { name: 'price', type: 'FLOAT4'},
+      ]
+    });
+    expect(translation).to.match(/id INT,\nprice FLOAT4/);
+  });
+
+  it('should generate primary key', () => {
+    const translation = translateCreation({ primaryKey: 'foo' });
+    expect(translation).to.match(/,PRIMARY KEY\(foo\)/);
+  });
+
+  it('should create table', () => {
+    const translation = translateCreation({ schema: 'foo', table: 'bar' });
     expect(translation).to.equal('CREATE TABLE IF NOT EXISTS foo.bar');
   });
 
-  it('puts it all together', () => {
-    const translation = translate({
-      type: "create",
+  it('should put it all together', () => {
+    const translation = translateCreation({
       schema: 'music',
       table: 'albums',
       description: 'This is table of musical albums',
@@ -75,7 +104,7 @@ $$;
 `);
   });
 
-  it('generates complex table', () => {
+  it('should generate complex table', () => {
     const translation = translate(resourcesJson);
     const expected = `CREATE TABLE IF NOT EXISTS resources.resources
 (
