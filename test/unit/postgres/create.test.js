@@ -54,6 +54,162 @@ describe('Postgres create adapter', () => {
     expect(translation).to.match(/,PRIMARY KEY\(foo\)/);
   });
 
+  it('should escape camelcase primary key', () => {
+    const translation = translateCreation({ primaryKey: 'fOO' });
+    expect(translation).to.match(/,PRIMARY KEY\("fOO"\)/);
+  });
+
+  it('should generate compound primary key', () => {
+    const translation = translateCreation({ primaryKey: ['foo', 'bar', 'baz'] });
+    expect(translation).to.match(/,PRIMARY KEY\(foo,bar,baz\)/);
+  });
+
+  it('should generate index', () => {
+    const translation = translateCreation({ schema: 'foo', table: 'bar', indexes: [ ['id'] ] });
+    expect(translation).to.equal(`CREATE TABLE IF NOT EXISTS foo.bar
+do
+$$
+begin
+if not exists (
+    select indexname
+        from pg_indexes
+    where schemaname = 'foo'
+        and tablename = 'bar'
+        and indexname = 'bar_id_idx'
+)
+then
+    create index bar_id_idx ON foo.bar(id);
+end if;
+end
+$$;
+`);
+  });
+
+  it('escapes camelcase index', () => {
+    const translation = translateCreation({ schema: 'fOO', table: 'bAR', indexes: [ ['bAZ'] ] });
+    expect(translation).to.equal(`CREATE TABLE IF NOT EXISTS "fOO"."bAR"
+do
+$$
+begin
+if not exists (
+    select indexname
+        from pg_indexes
+    where schemaname = 'fOO'
+        and tablename = 'bAR'
+        and indexname = 'bAR_bAZ_idx'
+)
+then
+    create index "bAR_bAZ_idx" ON "fOO"."bAR"("bAZ");
+end if;
+end
+$$;
+`);
+  });
+
+  it('generates compound index', () => {
+    const translation = translateCreation({ schema: 'foo', table: 'bar', indexes: [ ['id', 'name'] ] });
+    expect(translation).to.equal(`CREATE TABLE IF NOT EXISTS foo.bar
+do
+$$
+begin
+if not exists (
+    select indexname
+        from pg_indexes
+    where schemaname = 'foo'
+        and tablename = 'bar'
+        and indexname = 'bar_id_name_idx'
+)
+then
+    create index bar_id_name_idx ON foo.bar(id,name);
+end if;
+end
+$$;
+`);
+  });
+
+  it('generates multiple indexes', () => {
+    const translation = translateCreation({ schema: 'foo', table: 'bar', indexes: [ ['id'], ['name'] ] });
+    expect(translation).to.equal(`CREATE TABLE IF NOT EXISTS foo.bar
+do
+$$
+begin
+if not exists (
+    select indexname
+        from pg_indexes
+    where schemaname = 'foo'
+        and tablename = 'bar'
+        and indexname = 'bar_id_idx'
+)
+then
+    create index bar_id_idx ON foo.bar(id);
+end if;
+end
+$$;
+
+do
+$$
+begin
+if not exists (
+    select indexname
+        from pg_indexes
+    where schemaname = 'foo'
+        and tablename = 'bar'
+        and indexname = 'bar_name_idx'
+)
+then
+    create index bar_name_idx ON foo.bar(name);
+end if;
+end
+$$;
+`);
+  });
+
+  it('puts it all together', () => {
+    const translation = translateCreation({
+      schema: 'music',
+      table: 'albums',
+      description: 'This is table of musical albums',
+      columns: [
+        {name: 'id', type: 'INT', nullable: false, encode: 'DELTA32K'},
+        {name: 'title', type: 'VARCHAR', length: 256, encode: 'ZSTD'},
+        {name: 'dateReleased', type: 'DATE', encode: 'LZO'},
+      ],
+      primaryKey: 'id',
+      indexes: [
+        ['dateReleased'],
+      ],
+      distStyle: 'KEY',
+      distKey: 'title',
+      sortKey: 'id',
+    }
+  );
+
+    expect(translation).to.equal(`CREATE TABLE IF NOT EXISTS music.albums
+(
+id INT NOT NULL,
+title VARCHAR(256),
+"dateReleased" DATE
+,PRIMARY KEY(id)
+)
+;
+do
+$$
+begin
+if not exists (
+    select indexname
+        from pg_indexes
+    where schemaname = 'music'
+        and tablename = 'albums'
+        and indexname = 'albums_dateReleased_idx'
+)
+then
+    create index "albums_dateReleased_idx" ON music.albums("dateReleased");
+end if;
+end
+$$;
+`);
+  });
+
   it('should create table', () => {
     const translation = translateCreation({ schema: 'foo', table: 'bar' });
     expect(translation).to.equal('CREATE TABLE IF NOT EXISTS foo.bar');
