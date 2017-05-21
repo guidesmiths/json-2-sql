@@ -26,26 +26,21 @@ const TYPE_MAP = {
 
 const generateCreate = ({ schema, table }) => [ `CREATE TABLE IF NOT EXISTS ${ident(schema)}.${ident(table)}` ];
 
-const _generateColumn = (column) => {
-  column.type = TYPE_MAP[column.type.toUpperCase()];
-
-  const { name, type, length, nullable, default: defaultValue } = column;
-
+const generateColumn = ({ name, type, length, nullable, default: defaultValue }) => {
+  const colType = TYPE_MAP[type.toUpperCase()];
   const len = length ? `(${length})` : '';
   const notNull = nullable ? '' : ' NOT NULL';
   const def = defaultValue !== undefined ? ` DEFAULT ${defaultValue}` : '';
-
-  return `${ident(name)} ${type}${len}${notNull}${def}`;
+  return `${ident(name)} ${colType}${len}${notNull}${def}`;
 }
 
-const generateColumns = ({ columns }) => columns.map(R.bind(_generateColumn, this));
+const generateColumns = ({ columns }) => R.map(generateColumn, columns);
 
 const generatePrimaryKey = ({ primaryKey }) => primaryKey ? `,PRIMARY KEY(${ident(primaryKey)})` : '';
 
 const generateIndex = R.curry((schema, table, columns) => {
-  const bits = R.flatten([ table, columns, 'idx']);
-  const indexName = bits.join('_');
-  return formatFile(createIndexFile, {schema, table, indexName, columns });
+  const indexName = R.join('_', R.flatten([ table, columns, 'idx']));
+  return formatFile(createIndexFile, { schema, table, indexName, columns });
 });
 
 const generateIndexes = ({ schema, table, indexes }) => R.map(generateIndex(schema, table), indexes);
