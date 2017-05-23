@@ -2,7 +2,7 @@ const R = require('ramda');
 const expect = require('expect.js');
 const resourcesJson = require('../../test-schemas/resources/resources.json');
 
-const { translate } = require('../../..')('postgres').index; // TODO filter out
+const { translate } = require('../../..')('postgres').index;
 
 const translateCreation = R.pipe(
   R.merge({ type: 'create' }),
