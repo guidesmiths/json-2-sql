@@ -2,7 +2,7 @@ const R = require('ramda');
 const expect = require('expect.js');
 const resourcesJson = require('../../test-schemas/resources/resources.json');
 
-const { translate } = require('../../..')('redshift').index;
+const { redshift: translate } = require('../../..');
 
 const translateCreation = R.pipe(
   R.merge({ type: 'create' }),
