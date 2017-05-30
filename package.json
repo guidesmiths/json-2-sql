@@ -1,5 +1,5 @@
 {
-  "name": "json2sql",
+  "name": "jsonToSql",
   "version": "1.0.0",
   "description": "Adapters to generate sql tables for different dbs (postgres, redshift...) from json files",
   "main": "index.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/guidesmiths/json2sql.git"
+    "url": "git+https://github.com/guidesmiths/jsonToSql.git"
   },
   "keywords": [
     "json",
@@ -28,9 +28,9 @@
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/guidesmiths/json2sql/issues"
+    "url": "https://github.com/guidesmiths/jsonToSql/issues"
   },
-  "homepage": "https://github.com/guidesmiths/json2sql#readme",
+  "homepage": "https://github.com/guidesmiths/jsonToSql#readme",
   "dependencies": {
     "install": "^0.10.1",
     "json-sql": "^0.3.10",
