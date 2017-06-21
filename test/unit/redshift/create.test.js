@@ -39,6 +39,11 @@ describe('Redshift create adapter', () => {
     expect(translation).to.match(/id INT/);
   });
 
+  it('should passthru column types it doesnt recognize', () => {
+    const translation = translateCreation({ columns: [ { name: 'id', type: 'TIMESTAMP WITHOUT TIME ZONE' } ] });
+    expect(translation).to.match(/id TIMESTAMP WITHOUT TIME ZONE/);
+  });
+
   it('should join columns', () => {
     const translation = translateCreation({
       columns: [

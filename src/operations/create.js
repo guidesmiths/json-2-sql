@@ -27,7 +27,7 @@ const TYPE_MAP = {
 const generateCreate = ({ schema, table }) => [ `CREATE TABLE IF NOT EXISTS ${ident(schema)}.${ident(table)}` ];
 
 const generateColumn = ({ name, type, length, nullable, default: defaultValue, encode }) => {
-  const colType = TYPE_MAP[type.toUpperCase()];
+  const colType = TYPE_MAP[type.toUpperCase()] || type.toUpperCase();
   const len = length ? `(${length})` : '';
   const notNull = nullable ? '' : ' NOT NULL';
   const def = defaultValue !== undefined ? ` DEFAULT ${defaultValue}` : '';
