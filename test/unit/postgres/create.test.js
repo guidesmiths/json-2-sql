@@ -39,6 +39,32 @@ describe('Postgres create adapter', () => {
     expect(translation).to.match(/id INT/);
   });
 
+  it('should handle varchar length', () => {
+    const translation = translateCreation({ columns: [ { name: 'id', type: 'VARCHAR', length: 256 } ] });
+    expect(translation).to.match(/id VARCHAR\(256\)/);
+  });
+
+  it('should handle numeric precision', () => {
+    const translation = translateCreation({ columns: [ { name: 'id', type: 'NUMERIC', precision: 12, scale: 4 } ] });
+    expect(translation).to.match(/id NUMERIC\(12,4\)/);
+  });
+
+  it('should handle decimal precision', () => {
+    const translation = translateCreation({ columns: [ { name: 'id', type: 'DECIMAL', precision: 12, scale: 4 } ] });
+    expect(translation).to.match(/id DECIMAL\(12,4\)/);
+  });
+
+  it('should error if both length and precision/scale are included', (done) => {
+    try{
+      translateCreation({ columns: [ { name: 'id', type: 'DECIMAL', length: 123, precision: 12, scale: 4 } ] });
+    }catch ({ message }) {
+      expect(message).to.equal('length and precision/scale are mutually exclusive');
+      return done();
+    }
+
+    done('length and precision/scale should be mutually exclusive');
+  });
+
   it('should join columns', () => {
     const translation = translateCreation({
       columns: [

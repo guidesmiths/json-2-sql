@@ -26,13 +26,18 @@ const TYPE_MAP = {
 
 const generateCreate = ({ schema, table }) => [ `CREATE TABLE IF NOT EXISTS ${ident(schema)}.${ident(table)}` ];
 
-const generateColumn = ({ name, type, length, nullable, default: defaultValue, encode }) => {
+const generateColumn = ({ name, type, length, precision, scale, nullable, default: defaultValue, encode }) => {
+  if (length > 0 && (precision + scale) > 0 ) {
+    throw new Error('length and precision/scale are mutually exclusive');
+  }
+
   const colType = TYPE_MAP[type.toUpperCase()] || type.toUpperCase();
   const len = length ? `(${length})` : '';
+  const prec = precision ? `(${[precision,scale].join(',')})` : '';
   const notNull = nullable ? '' : ' NOT NULL';
   const def = defaultValue !== undefined ? ` DEFAULT ${defaultValue}` : '';
   const encodeValue = encode ? ` ENCODE ${encode}` : '';
-  return `${ident(name)} ${colType}${len}${notNull}${def}${encodeValue}`;
+  return `${ident(name)} ${colType}${len}${prec}${notNull}${def}${encodeValue}`;
 }
 
 const generateColumns = ({ columns }) => R.map(generateColumn, columns);
