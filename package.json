@@ -1,6 +1,6 @@
 {
   "name": "json-2-sql",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Adapters to generate sql tables for different dbs (postgres, redshift...) from json files",
   "main": "index.js",
   "scripts": {
